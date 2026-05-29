@@ -776,14 +776,14 @@ Tools are the functions that the agent has to interact with the world.
 ## Quick Example
 
 ```python  theme={null}
-from browser_use import Tools, ActionResult, BrowserSession
+from browser_use import Tools, ActionResult, Browser
 
 tools = Tools()
 
 @tools.action('Ask human for help with a question')
-async def ask_human(question: str, browser_session: BrowserSession) -> ActionResult:
+def ask_human(question: str, browser: Browser) -> ActionResult:
     answer = input(f'{question} > ')
-    return ActionResult(extracted_content=f'The human responded with: {answer}')
+    return f'The human responded with: {answer}'
 
 agent = Agent(
     task='Ask human for help',
@@ -792,13 +792,8 @@ agent = Agent(
 )
 ```
 
-<Warning>
-**Important**: The parameter must be named exactly `browser_session` with type `BrowserSession` (not `browser: Browser`). 
-The agent injects parameters by name matching, so using the wrong name will cause your tool to fail silently.
-</Warning>
-
 <Note>
-  Use `browser_session` parameter in tools for deterministic [Actor](https://docs.browser-use.com/customize/actor/basics) actions.
+  Use `browser` parameter in tools for deterministic [Actor](https://docs.browser-use.com/customize/actor/basics) actions.
 </Note>
 
 
@@ -826,9 +821,9 @@ from browser_use import Tools, Agent, ActionResult
 tools = Tools()
 
 @tools.action(description='Ask human for help with a question')
-async def ask_human(question: str) -> ActionResult:
+def ask_human(question: str) -> ActionResult:
     answer = input(f'{question} > ')
-    return ActionResult(extracted_content=f'The human responded with: {answer}')
+    return f'The human responded with: {answer}'
 ```
 
 ```python  theme={null}
@@ -839,11 +834,6 @@ agent = Agent(task='...', llm=llm, tools=tools)
 * `allowed_domains` - List of domains where tool can run (e.g. `['*.example.com']`), defaults to all domains
 
 The Agent fills your function parameters based on their names, type hints, & defaults.
-
-<Warning>
-**Common Pitfall**: Parameter names must match exactly! Use `browser_session: BrowserSession` (not `browser: Browser`). 
-The agent injects special parameters by **name matching**, so using incorrect names will cause your tool to fail silently.
-</Warning>
 
 
 # Tools: Available Tools

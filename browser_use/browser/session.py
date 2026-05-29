@@ -1,6 +1,7 @@
 """Event-driven browser session with backwards compatibility."""
 
 import asyncio
+import json
 import logging
 from functools import cached_property
 from pathlib import Path
@@ -140,7 +141,6 @@ class BrowserSession(BaseModel):
 		id: str | None = None,
 		headers: dict[str, str] | None = None,
 		allowed_domains: list[str] | None = None,
-		prohibited_domains: list[str] | None = None,
 		keep_alive: bool | None = None,
 		minimum_wait_page_load_time: float | None = None,
 		wait_for_network_idle_page_load_time: float | None = None,
@@ -173,7 +173,6 @@ class BrowserSession(BaseModel):
 		# Common params
 		headers: dict[str, str] | None = None,
 		allowed_domains: list[str] | None = None,
-		prohibited_domains: list[str] | None = None,
 		keep_alive: bool | None = None,
 		minimum_wait_page_load_time: float | None = None,
 		wait_for_network_idle_page_load_time: float | None = None,
@@ -273,7 +272,6 @@ class BrowserSession(BaseModel):
 		disable_security: bool | None = None,
 		deterministic_rendering: bool | None = None,
 		allowed_domains: list[str] | None = None,
-		prohibited_domains: list[str] | None = None,
 		keep_alive: bool | None = None,
 		proxy: ProxySettings | None = None,
 		enable_default_extensions: bool | None = None,
@@ -640,7 +638,7 @@ class BrowserSession(BaseModel):
 
 					# Get the CDP URL from LocalBrowserWatchdog handler result
 					launch_result: BrowserLaunchResult = cast(
-						BrowserLaunchResult, await launch_event.event_result(raise_if_none=True, raise_if_any=True)
+						BrowserLaunchResult, await launch_event.event_result(timeout=60.0, raise_if_none=True, raise_if_any=True)
 					)
 					self.browser_profile.cdp_url = launch_result.cdp_url
 				else:
@@ -1519,11 +1517,19 @@ class BrowserSession(BaseModel):
 			# Run a tiny HTTP client to query for the WebSocket URL from the /json/version endpoint
 			async with httpx.AsyncClient() as client:
 				headers = self.browser_profile.headers or {}
-				version_info = await client.get(url, headers=headers)
-				self.logger.debug(f'Raw version info: {str(version_info)}')
-				self.browser_profile.cdp_url = version_info.json()['webSocketDebuggerUrl']
-
-		assert self.cdp_url is not None, 'CDP URL is None.'
+				try:
+					version_info = await client.get(url, headers=headers, timeout=5.0)
+					self.logger.debug(f'Raw version info: {str(version_info)}')
+					self.logger.debug(f'Raw version content: {version_info.text}')
+					version_data = version_info.json()
+					self.browser_profile.cdp_url = version_data['webSocketDebuggerUrl']
+				except Exception as e:
+					self.logger.error(f'Failed to get WebSocket URL: {e}')
+					# Reset CDP URL to None to trigger browser launch
+					self.browser_profile.cdp_url = None
+					self.logger.warning('Failed to get WebSocket URL. Resetting CDP URL to trigger browser launch.')
+					# Return early to allow browser launch
+					return self
 
 		browser_location = 'local browser' if self.is_local else 'remote browser'
 		self.logger.debug(f'🌎 Connecting to existing chromium-based browser via CDP: {self.cdp_url} -> ({browser_location})')

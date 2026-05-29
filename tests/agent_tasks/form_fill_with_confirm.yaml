@@ -1,0 +1,39 @@
+name: 表单填写（需人工确认）
+task: |
+  任务：填写联系表单并等待确认
+  
+  步骤：
+  1. 访问表单页面
+  2. 填写以下信息：
+     - 姓名：张三
+     - 邮箱：zhangsan@example.com
+     - 电话：13800138000
+     - 留言：这是一条测试消息
+  
+  3. 填写完成后，使用 confirm_form_content 工具
+     - 参数 form_summary 应包含所有填写的内容
+     - 例如："姓名：张三, 邮箱：zhangsan@example.com, ..."
+  
+  4. 等待工具返回结果：
+     - 如果返回 success=True，继续下一步
+     - 如果返回 success=False，立即停止任务
+  
+  5. 使用 confirm_final_submit 工具进行最终确认
+  
+  6. 等待工具返回结果：
+     - 如果返回 success=True，提交表单
+     - 如果返回 success=False，停止任务，不要提交
+  
+  重要规则：
+  - 必须等待用户确认后才能提交
+  - 不要跳过确认步骤
+  - 如果用户取消，立即停止任务
+  - 不要在未确认的情况下提交表单
+
+judge_context:
+  - 必须填写所有字段
+  - 必须使用 confirm_form_content 工具
+  - 必须使用 confirm_final_submit 工具
+  - 必须等待用户确认
+  - 只有在用户确认后才能提交
+max_steps: 25

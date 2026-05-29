@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, TypeVar
 
 from pydantic import BaseModel
 
-from browser_use import logger
 from browser_use.actor.utils import get_key_info
 from browser_use.dom.serializer.serializer import DOMTreeSerializer
 from browser_use.dom.service import DomService
@@ -130,8 +129,8 @@ class Page:
 		else:
 			expression = f'({page_function})()'
 
-		# Debug: log the actual expression being evaluated
-		logger.debug(f'Evaluating JavaScript: {repr(expression)}')
+		# Debug: print the actual expression being evaluated
+		print(f'DEBUG: Evaluating JavaScript: {repr(expression)}')
 
 		params: 'EvaluateParameters' = {'expression': expression, 'returnByValue': True, 'awaitPromise': True}
 		result = await self._client.send.Runtime.evaluate(

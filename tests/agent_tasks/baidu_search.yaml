@@ -1,0 +1,9 @@
+name: 百度搜索Python教程
+task: |
+  访问百度搜索，搜索"Python教程"
+  提取前3个搜索结果的标题
+judge_context:
+  - 必须访问百度搜索引擎
+  - 必须搜索"Python教程"关键词
+  - 必须返回至少3个搜索结果标题
+max_steps: 10

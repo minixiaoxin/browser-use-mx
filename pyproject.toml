@@ -2,7 +2,7 @@
 name = "browser-use"
 description = "Make websites accessible for AI agents"
 authors = [{ name = "Gregor Zunic" }]
-version = "0.11.4"
+version = "0.11.2"
 readme = "README.md"
 requires-python = ">=3.11,<4.0"
 classifiers = [
@@ -11,7 +11,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "aiohttp>=3.13.3",
+    "aiohttp==3.12.15",
     "anyio>=4.9.0",
     "bubus>=1.5.6",
     "click>=8.1.8",
@@ -92,11 +92,8 @@ all = ["browser-use[cli,examples,aws,oci]"]
 Repository = "https://github.com/browser-use/browser-use"
 
 [project.scripts]
-browser-use = "browser_use.skill_cli.main:main"  # Fast CLI for browser automation
-browseruse = "browser_use.skill_cli.main:main"  # Alias for browser-use
-bu = "browser_use.skill_cli.main:main"  # Alias for browser-use
-browser = "browser_use.skill_cli.main:main"  # Alias for browser-use
-browser-use-tui = "browser_use.cli:main"  # Legacy TUI interface
+browseruse = "browser_use.cli:main"
+browser-use = "browser_use.cli:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -201,17 +198,8 @@ log_level = "DEBUG"
 [tool.hatch.metadata]
 allow-direct-references = true
 
-[tool.uv]
-# required-environments = [
-#     "sys_platform == 'darwin' and platform_machine == 'arm64'",
-#     "sys_platform == 'darwin' and platform_machine == 'x86_64'",
-#     "sys_platform == 'linux' and platform_machine == 'x86_64'",
-#     "sys_platform == 'linux' and platform_machine == 'aarch64'",
-#     # "sys_platform == 'linux' and platform_machine == 'arm64'",  # no pytorch wheels available yet
-#     "sys_platform == 'win32' and platform_machine == 'x86_64'",
-#     # "sys_platform == 'win32' and platform_machine == 'arm64'",  # no pytorch wheels available yet
-# ]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "ruff>=0.11.2",
     "tokencost>=0.1.16",
     "build>=1.2.2",
@@ -232,3 +220,14 @@ dev-dependencies = [
     "pytest-timeout>=2.4.0",
     "pydantic_settings>=2.10.1",
 ]
+
+[tool.uv]
+# required-environments = [
+#     "sys_platform == 'darwin' and platform_machine == 'arm64'",
+#     "sys_platform == 'darwin' and platform_machine == 'x86_64'",
+#     "sys_platform == 'linux' and platform_machine == 'x86_64'",
+#     "sys_platform == 'linux' and platform_machine == 'aarch64'",
+#     # "sys_platform == 'linux' and platform_machine == 'arm64'",  # no pytorch wheels available yet
+#     "sys_platform == 'win32' and platform_machine == 'x86_64'",
+#     # "sys_platform == 'win32' and platform_machine == 'arm64'",  # no pytorch wheels available yet
+# ]

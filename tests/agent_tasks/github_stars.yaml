@@ -1,0 +1,9 @@
+name: GitHub仓库星标查询
+task: |
+  访问GitHub，搜索"browser-use"仓库
+  返回该仓库的星标数量
+judge_context:
+  - 必须访问GitHub网站
+  - 必须找到browser-use仓库
+  - 必须返回准确的星标数量
+max_steps: 10
